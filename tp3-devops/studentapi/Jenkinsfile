@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven'
+        jdk 'JDK17'
+    }
+
+    environment {
+        APP_NAME = 'studentapi'
+        APP_VERSION = '1.0-SNAPSHOT'
+    }
+
+    stages {
+
+        stage('📥 Checkout') {
+            steps {
+                echo '📥 Récupération du code source...'
+                checkout scm
+            }
+        }
+
+        stage('🔨 Build') {
+            steps {
+                echo '🔨 Compilation du projet...'
+                dir('tp3-devops/studentapi') {
+                    sh 'mvn clean compile'
+                }
+            }
+        }
+
+        stage('🧪 Test') {
+            steps {
+                echo '🧪 Lancement des tests...'
+                dir('tp3-devops/studentapi') {
+                    sh 'mvn test'
+                }
+            }
+            post {
+                always {
+                    echo '📊 Tests terminés'
+                }
+            }
+        }
+
+        stage('📦 Package') {
+            steps {
+                echo '📦 Packaging de l application...'
+                dir('tp3-devops/studentapi') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: 'tp3-devops/studentapi/target/*.jar',
+                                     fingerprint: true
+                }
+            }
+        }
+
+        stage('✅ Deploy') {
+            steps {
+                echo '✅ Application prête au déploiement !'
+                echo "App: ${env.APP_NAME} v${env.APP_VERSION}"
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '🎉 Pipeline terminé avec succès !'
+        }
+        failure {
+            echo '❌ Pipeline échoué !'
+        }
+        always {
+            echo '🏁 Fin du pipeline'
+        }
+    }
+}
