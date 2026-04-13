@@ -1,0 +1,33 @@
+Vagrant.configure("2") do |config|
+
+  config.vm.define "server-back" do |back|
+    back.vm.box = "ubuntu/focal64"
+    back.vm.hostname = "server-back"
+    back.vm.network "private_network", ip: "192.168.56.30"
+    back.vm.provider "virtualbox" do |vb|
+      vb.memory = "1512"
+      vb.cpus = 2
+    end
+  end
+
+  config.vm.define "server-dba" do |dba|
+    dba.vm.box = "ubuntu/focal64"
+    dba.vm.hostname = "server-dba"
+    dba.vm.network "private_network", ip: "192.168.56.31"
+    dba.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 1
+    end
+  end
+
+  config.vm.define "server-front" do |front|
+    front.vm.box = "ubuntu/focal64"
+    front.vm.hostname = "server-front"
+    front.vm.network "private_network", ip: "192.168.56.32"
+    front.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 1
+    end
+  end
+
+end
